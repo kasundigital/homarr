@@ -1,0 +1,149 @@
+---
+title: HomeHub notifications
+description: Configure Telegram notifications, filtering rules, notification history and incoming webhooks in the HomeHub fork.
+---
+
+# HomeHub notifications
+
+HomeHub adds a configurable notification layer on top of the Homarr dashboard.
+
+Open **Management → Notifications** to configure the feature.
+
+## Telegram
+
+Configure a Telegram bot token, chat ID and optional topic/thread ID. The saved token is not returned to the browser after it is stored.
+
+You can customize the Telegram message template with:
+
+- `{{severity}}`
+- `{{source}}`
+- `{{title}}`
+- `{{message}}`
+- `{{sender}}`
+- `{{category}}`
+- `{{account}}`
+- `{{receivedAt}}`
+
+Use **Test Telegram** after saving the bot settings.
+
+## Ignore lists
+
+The simple ignore controls support one value per line.
+
+**Ignored senders / numbers** matches the sender field case-insensitively using a contains match.
+
+**Ignored words / messages** checks both the title and message.
+
+Ignored notifications can optionally remain in notification history.
+
+## Advanced rules
+
+The advanced rule editor accepts a JSON array. A rule can match:
+
+- source
+- sender
+- title
+- message
+- severity
+- category
+- account
+- tags
+
+Operators:
+
+- equals
+- contains
+- startsWith
+- endsWith
+- regex
+- in
+
+Actions:
+
+- send
+- ignore
+- archive
+- setSeverity
+- addTag
+- setCategory
+
+Rules have a numeric priority and can stop further processing. Optional schedules support timezone, days of week, start time and end time. Overnight schedules are supported.
+
+Example:
+
+```json
+[
+  {
+    "id": "critical-stackpulse",
+    "name": "Critical StackPulse alerts",
+    "enabled": true,
+    "priority": 500,
+    "stopProcessing": true,
+    "match": "all",
+    "conditions": [
+      { "field": "source", "operator": "equals", "value": "StackPulse" },
+      { "field": "severity", "operator": "equals", "value": "critical" }
+    ],
+    "actions": [
+      { "type": "send", "channels": ["telegram"] },
+      { "type": "addTag", "tag": "server" }
+    ]
+  }
+]
+```
+
+## Incoming webhook
+
+HomeHub exposes:
+
+```text
+POST /api/homehub/notify
+```
+
+Generate and save an ingest token in the Notifications page. Authenticate using either:
+
+```text
+Authorization: Bearer YOUR_TOKEN
+```
+
+or:
+
+```text
+x-homehub-token: YOUR_TOKEN
+```
+
+Example request body:
+
+```json
+{
+  "source": "n8n",
+  "sender": "CEB",
+  "title": "Electricity bill received",
+  "message": "Rs 8,420 due on 2026-10-06",
+  "severity": "warning",
+  "category": "bills",
+  "tags": ["electricity", "bill"]
+}
+```
+
+The endpoint returns the final disposition, matched rules and delivery result.
+
+## History
+
+The History tab records notifications as sent, ignored, archived or failed. It also stores matching rule IDs, reasons and Telegram delivery errors. The history limit is configurable from 10 to 1000 entries.
+
+## Docker install
+
+The HomeHub fork publishes its own image:
+
+```text
+ghcr.io/kasundigital/homehub:latest
+```
+
+One-command installer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kasundigital/homarr/homehub-dev/install-homehub.sh | sudo bash
+```
+
+The default persistent data directory is `/home/docker/homehub/data` and the dashboard listens on port `7575`.
