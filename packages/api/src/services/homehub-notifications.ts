@@ -7,7 +7,7 @@ import {
   type IncomingNotification,
   type NotificationHistoryItem,
   type NotificationRule,
-} from "@homehub/notification-engine";
+} from "../homehub-notification-engine";
 import type { Database } from "@homarr/db";
 import { eq } from "@homarr/db";
 import { serverSettings } from "@homarr/db/schema";
