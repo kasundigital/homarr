@@ -517,7 +517,7 @@ export const HomeHubNotificationsManager = () => {
                         {item.disposition}
                       </Badge>
                     </Table.Td>
-                    <Table.Td>{item.error ?? item.reasons.join(", ") || "—"}</Table.Td>
+                    <Table.Td>{item.error ?? (item.reasons.join(", ") || "—")}</Table.Td>
                   </Table.Tr>
                 ))}
                 {history.length === 0 && (
