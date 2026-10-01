@@ -56,10 +56,6 @@ services:
       - "${PORT}:7575"
     env_file:
       - ${ENV_FILE}
-    environment:
-      TZ: ${TZ_VALUE}
-      AUTH_SECRET: ${AUTH_SECRET:-}
-      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:-}
     volumes:
       - ${INSTALL_DIR}/data:/appdata
       - /var/run/docker.sock:/var/run/docker.sock
