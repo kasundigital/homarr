@@ -33,9 +33,17 @@ if [[ -f "${COMPOSE_FILE}" ]]; then
   cp "${COMPOSE_FILE}" "${COMPOSE_FILE}.bak.$(date +%Y%m%d%H%M%S)"
 fi
 
+random_hex_32() {
+  if command -v openssl >/dev/null 2>&1; then
+    openssl rand -hex 32
+  else
+    od -An -N32 -tx1 /dev/urandom | tr -d ' \n'
+  fi
+}
+
 if [[ ! -f "${ENV_FILE}" ]]; then
-  AUTH_SECRET="$(openssl rand -hex 32)"
-  ENCRYPTION_KEY="$(openssl rand -hex 32)"
+  AUTH_SECRET="$(random_hex_32)"
+  ENCRYPTION_KEY="$(random_hex_32)"
 
   cat >"${ENV_FILE}" <<EOF
 AUTH_SECRET=${AUTH_SECRET}
