@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - homehub-dev
+      - dev
   workflow_dispatch:
 
 permissions:
