@@ -129,6 +129,34 @@ export const HomeHubNotificationsManager = () => {
     },
   });
 
+  const clearBotTokenMutation = clientApi.homehubNotifications.clearTelegramToken.useMutation({
+    onSuccess: async () => {
+      setForm((current) => ({ ...current, telegramBotToken: "", telegramEnabled: false }));
+      await settingsQuery.refetch();
+      showSuccessNotification({
+        title: "Telegram token removed",
+        message: "The saved Telegram bot token was deleted.",
+      });
+    },
+    onError: (error) => {
+      showErrorNotification({ title: "Unable to remove token", message: error.message });
+    },
+  });
+
+  const clearIngestTokenMutation = clientApi.homehubNotifications.clearIngestToken.useMutation({
+    onSuccess: async () => {
+      setForm((current) => ({ ...current, ingestToken: "" }));
+      await settingsQuery.refetch();
+      showSuccessNotification({
+        title: "Webhook token removed",
+        message: "Incoming notification requests now require a new token.",
+      });
+    },
+    onError: (error) => {
+      showErrorNotification({ title: "Unable to remove token", message: error.message });
+    },
+  });
+
   const testMutation = clientApi.homehubNotifications.testTelegram.useMutation({
     onSuccess: () => {
       showSuccessNotification({
@@ -212,6 +240,7 @@ export const HomeHubNotificationsManager = () => {
   }
 
   const botConfigured = settingsQuery.data?.botTokenConfigured ?? false;
+  const ingestTokenConfigured = settingsQuery.data?.ingestTokenConfigured ?? false;
   const history = historyQuery.data ?? [];
 
   return (
@@ -370,6 +399,16 @@ export const HomeHubNotificationsManager = () => {
                 >
                   Test Telegram
                 </Button>
+                {botConfigured && (
+                  <Button
+                    color="red"
+                    variant="subtle"
+                    loading={clearBotTokenMutation.isPending}
+                    onClick={() => clearBotTokenMutation.mutate()}
+                  >
+                    Remove saved bot token
+                  </Button>
+                )}
               </Group>
             </Stack>
           </Card>
@@ -559,21 +598,45 @@ export const HomeHubNotificationsManager = () => {
                 }
               />
 
-              <PasswordInput
-                label="Ingest token"
-                value={form.ingestToken}
-                onChange={(event) => setForm({ ...form, ingestToken: event.currentTarget.value })}
-                rightSectionWidth={110}
-                rightSection={
-                  <Button
-                    size="compact-xs"
-                    variant="subtle"
-                    onClick={() => setForm({ ...form, ingestToken: generateToken() })}
-                  >
-                    Generate
-                  </Button>
-                }
-              />
+              <Group justify="space-between" align="end">
+                <PasswordInput
+                  label="Ingest token"
+                  description={
+                    ingestTokenConfigured
+                      ? "A token is already saved. Generate a new one only when you want to rotate it."
+                      : "Generate a token before connecting n8n or another service."
+                  }
+                  value={form.ingestToken}
+                  onChange={(event) => setForm({ ...form, ingestToken: event.currentTarget.value })}
+                  rightSectionWidth={110}
+                  rightSection={
+                    <Button
+                      size="compact-xs"
+                      variant="subtle"
+                      onClick={() => setForm({ ...form, ingestToken: generateToken() })}
+                    >
+                      Generate
+                    </Button>
+                  }
+                  style={{ flex: 1 }}
+                />
+                <Stack gap={4}>
+                  <Badge color={ingestTokenConfigured ? "green" : "gray"}>
+                    {ingestTokenConfigured ? "Token configured" : "No token"}
+                  </Badge>
+                  {ingestTokenConfigured && (
+                    <Button
+                      size="compact-sm"
+                      color="red"
+                      variant="subtle"
+                      loading={clearIngestTokenMutation.isPending}
+                      onClick={() => clearIngestTokenMutation.mutate()}
+                    >
+                      Remove token
+                    </Button>
+                  )}
+                </Stack>
+              </Group>
 
               <Alert title="Authentication">
                 Use <Code>Authorization: Bearer YOUR_TOKEN</Code> or{" "}
