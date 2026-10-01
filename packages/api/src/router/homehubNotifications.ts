@@ -71,10 +71,12 @@ export const homehubNotificationsRouter = createTRPCRouter({
     const settings = await getHomeHubNotificationSettingsAsync(ctx.db);
     return {
       ...settings,
+      ingestToken: "",
       telegram: {
         ...settings.telegram,
         botToken: "",
       },
+      ingestTokenConfigured: settings.ingestToken.length > 0,
       botTokenConfigured: settings.telegram.botToken.length > 0,
     };
   }),
@@ -86,6 +88,7 @@ export const homehubNotificationsRouter = createTRPCRouter({
       const current = await getHomeHubNotificationSettingsAsync(ctx.db);
       const next: HomeHubNotificationSettings = {
         ...input,
+        ingestToken: input.ingestToken.trim() || current.ingestToken,
         telegram: {
           ...input.telegram,
           botToken: input.telegram.botToken.trim() || current.telegram.botToken,
@@ -94,6 +97,32 @@ export const homehubNotificationsRouter = createTRPCRouter({
         ignoredKeywords: input.ignoredKeywords.map((value) => value.trim()).filter(Boolean),
       };
       await saveHomeHubNotificationSettingsAsync(ctx.db, next);
+      return { success: true };
+    }),
+
+  clearTelegramToken: permissionRequiredProcedure
+    .requiresPermission("admin")
+    .mutation(async ({ ctx }) => {
+      const current = await getHomeHubNotificationSettingsAsync(ctx.db);
+      await saveHomeHubNotificationSettingsAsync(ctx.db, {
+        ...current,
+        telegram: {
+          ...current.telegram,
+          botToken: "",
+          enabled: false,
+        },
+      });
+      return { success: true };
+    }),
+
+  clearIngestToken: permissionRequiredProcedure
+    .requiresPermission("admin")
+    .mutation(async ({ ctx }) => {
+      const current = await getHomeHubNotificationSettingsAsync(ctx.db);
+      await saveHomeHubNotificationSettingsAsync(ctx.db, {
+        ...current,
+        ingestToken: "",
+      });
       return { success: true };
     }),
 
