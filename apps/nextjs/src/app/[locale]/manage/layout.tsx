@@ -3,6 +3,7 @@ import { AppShellMain } from "@mantine/core";
 import {
   IconAffiliateFilled,
   IconApi,
+  IconBellFilled,
   IconBook2,
   IconBox,
   IconBrandDiscord,
@@ -190,6 +191,12 @@ export default async function ManageLayout({ children }: PropsWithChildren) {
           hidden: !session?.user.permissions.includes("admin") || dbEnv.DRIVER !== "better-sqlite3",
         },
       ],
+    },
+    {
+      label: "Notifications",
+      href: "/manage/notifications",
+      icon: IconBellFilled,
+      hidden: !session?.user.permissions.includes("admin"),
     },
     {
       label: t("items.settings"),
