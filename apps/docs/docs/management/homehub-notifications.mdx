@@ -147,3 +147,8 @@ curl -fsSL https://raw.githubusercontent.com/kasundigital/homarr/homehub-dev/ins
 ```
 
 The default persistent data directory is `/home/docker/homehub/data` and the dashboard listens on port `7575`.
+
+
+## Secret storage
+
+HomeHub encrypts the Telegram bot token and webhook ingest token at rest using Homarr's existing secret encryption key. Saved secret values are never returned to the management browser. You can rotate or remove either token from the Notifications page.
