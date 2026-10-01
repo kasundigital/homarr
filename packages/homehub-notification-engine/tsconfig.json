@@ -1,7 +1,0 @@
-{
-  "extends": "@homarr/tsconfig/base.json",
-  "compilerOptions": {
-    "lib": ["ES2022", "DOM"]
-  },
-  "include": ["*.ts", "src/**/*.ts"]
-}
