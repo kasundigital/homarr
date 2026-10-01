@@ -18,7 +18,8 @@
     "./shared": "./src/shared.ts",
     "./open-api": "./src/open-api.ts",
     "./custom-widget/display-data": "./src/router/custom-widget/display-data.ts",
-    "./mcp": "./src/mcp.ts"
+    "./mcp": "./src/mcp.ts",
+    "./homehub-notifications": "./src/services/homehub-notifications.ts"
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
@@ -60,7 +61,8 @@
     "superjson": "catalog:",
     "trpc-to-mcp": "catalog:",
     "trpc-to-openapi": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@homehub/notification-engine": "workspace:^0.1.0"
   },
   "devDependencies": {
     "@homarr/tsconfig": "workspace:^0.1.0",
