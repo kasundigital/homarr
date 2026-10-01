@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 
-import { sendTelegramNotification, type HomeHubNotificationSettings } from "@homehub/notification-engine";
+import { sendTelegramNotification, type HomeHubNotificationSettings } from "../homehub-notification-engine";
 
 import { createTRPCRouter, permissionRequiredProcedure } from "../trpc";
 import {
