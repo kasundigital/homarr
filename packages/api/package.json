@@ -61,8 +61,7 @@
     "superjson": "catalog:",
     "trpc-to-mcp": "catalog:",
     "trpc-to-openapi": "catalog:",
-    "zod": "catalog:",
-    "@homehub/notification-engine": "workspace:^0.1.0"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@homarr/tsconfig": "workspace:^0.1.0",
