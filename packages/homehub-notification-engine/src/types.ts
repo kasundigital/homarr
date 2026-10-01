@@ -98,3 +98,38 @@ export interface NotificationPreferences {
   keepIgnoredInHistory: boolean;
   rules: NotificationRule[];
 }
+
+export interface TelegramNotificationSettings {
+  enabled: boolean;
+  botToken: string;
+  chatId: string;
+  topicId: string;
+  parseMode: "HTML" | "MarkdownV2" | "None";
+  disableWebPagePreview: boolean;
+  messageTemplate: string;
+}
+
+export interface HomeHubNotificationSettings {
+  enabled: boolean;
+  ingestToken: string;
+  keepIgnoredInHistory: boolean;
+  historyLimit: number;
+  defaultChannelIds: string[];
+  ignoredSenders: string[];
+  ignoredKeywords: string[];
+  rules: NotificationRule[];
+  telegram: TelegramNotificationSettings;
+}
+
+export interface NotificationHistoryItem {
+  id: string;
+  notification: IncomingNotification;
+  disposition: NotificationDisposition | "failed";
+  channelIds: string[];
+  matchedRuleIds: string[];
+  reasons: string[];
+  createdAt: string;
+  deliveredAt?: string | null;
+  error?: string | null;
+  read: boolean;
+}
