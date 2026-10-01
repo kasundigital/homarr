@@ -8,13 +8,9 @@ import type {
   NotificationRuleSchedule,
 } from "./types";
 
-const normalize = (value: unknown): string =>
-  value === null || value === undefined ? "" : String(value);
+const normalize = (value: unknown): string => (value === null || value === undefined ? "" : String(value));
 
-const readField = (
-  notification: IncomingNotification,
-  field: NotificationMatchField,
-): string | string[] => {
+const readField = (notification: IncomingNotification, field: NotificationMatchField): string | string[] => {
   switch (field) {
     case "source":
       return notification.source;
@@ -35,11 +31,7 @@ const readField = (
   }
 };
 
-const compareText = (
-  actual: string,
-  expected: string,
-  condition: NotificationCondition,
-): boolean => {
+const compareText = (actual: string, expected: string, condition: NotificationCondition): boolean => {
   const caseSensitive = condition.caseSensitive ?? false;
   const left = caseSensitive ? actual : actual.toLocaleLowerCase();
   const right = caseSensitive ? expected : expected.toLocaleLowerCase();
@@ -74,8 +66,7 @@ const getLocalParts = (date: Date, timezone: string) => {
     hourCycle: "h23",
   }).formatToParts(date);
 
-  const value = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((part) => part.type === type)?.value ?? "";
+  const value = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? "";
 
   const weekdayMap: Record<string, number> = {
     Sun: 0,
@@ -93,10 +84,7 @@ const getLocalParts = (date: Date, timezone: string) => {
   };
 };
 
-const scheduleMatches = (
-  schedule: NotificationRuleSchedule | undefined,
-  date: Date,
-): boolean => {
+const scheduleMatches = (schedule: NotificationRuleSchedule | undefined, date: Date): boolean => {
   if (!schedule) return true;
 
   const timezone = schedule.timezone || "UTC";
@@ -117,14 +105,9 @@ const scheduleMatches = (
   return local.time >= schedule.start || local.time <= schedule.end;
 };
 
-export const matchesCondition = (
-  notification: IncomingNotification,
-  condition: NotificationCondition,
-): boolean => {
+export const matchesCondition = (notification: IncomingNotification, condition: NotificationCondition): boolean => {
   const actual = readField(notification, condition.field);
-  const expected = Array.isArray(condition.value)
-    ? condition.value.map(normalize)
-    : [normalize(condition.value)];
+  const expected = Array.isArray(condition.value) ? condition.value.map(normalize) : [normalize(condition.value)];
 
   let matched = false;
 
@@ -134,22 +117,16 @@ export const matchesCondition = (
     if (condition.operator === "in") {
       matched = actualValues.some((value) =>
         expected.some((item) =>
-          (condition.caseSensitive ?? false)
-            ? value === item
-            : value.toLocaleLowerCase() === item.toLocaleLowerCase(),
+          (condition.caseSensitive ?? false) ? value === item : value.toLocaleLowerCase() === item.toLocaleLowerCase(),
         ),
       );
     } else {
-      matched = actualValues.some((value) =>
-        expected.some((item) => compareText(value, item, condition)),
-      );
+      matched = actualValues.some((value) => expected.some((item) => compareText(value, item, condition)));
     }
   } else if (condition.operator === "in") {
     const value = normalize(actual);
     matched = expected.some((item) =>
-      (condition.caseSensitive ?? false)
-        ? value === item
-        : value.toLocaleLowerCase() === item.toLocaleLowerCase(),
+      (condition.caseSensitive ?? false) ? value === item : value.toLocaleLowerCase() === item.toLocaleLowerCase(),
     );
   } else {
     matched = expected.some((item) => compareText(normalize(actual), item, condition));
@@ -158,17 +135,11 @@ export const matchesCondition = (
   return condition.negate ? !matched : matched;
 };
 
-export const matchesRule = (
-  notification: IncomingNotification,
-  rule: NotificationRule,
-  now = new Date(),
-): boolean => {
+export const matchesRule = (notification: IncomingNotification, rule: NotificationRule, now = new Date()): boolean => {
   if (!rule.enabled || !scheduleMatches(rule.schedule, now)) return false;
   if (rule.conditions.length === 0) return true;
 
-  const results = rule.conditions.map((condition) =>
-    matchesCondition(notification, condition),
-  );
+  const results = rule.conditions.map((condition) => matchesCondition(notification, condition));
 
   return rule.match === "all" ? results.every(Boolean) : results.some(Boolean);
 };
@@ -187,9 +158,7 @@ export const evaluateNotification = (
   const matchedRuleIds: string[] = [];
   const reasons: string[] = [];
 
-  const rules = [...preferences.rules].sort(
-    (left, right) => right.priority - left.priority,
-  );
+  const rules = [...preferences.rules].toSorted((left, right) => right.priority - left.priority);
 
   for (const rule of rules) {
     if (!matchesRule(notification, rule)) continue;
@@ -215,9 +184,7 @@ export const evaluateNotification = (
           notification.severity = action.severity;
           break;
         case "addTag":
-          notification.tags = Array.from(
-            new Set([...(notification.tags ?? []), action.tag]),
-          );
+          notification.tags = Array.from(new Set([...(notification.tags ?? []), action.tag]));
           break;
         case "setCategory":
           notification.category = action.category;

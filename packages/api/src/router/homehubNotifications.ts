@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 
-import { sendTelegramNotification, type HomeHubNotificationSettings } from "../homehub-notification-engine";
+import { sendTelegramNotification } from "../homehub-notification-engine";
+import type { HomeHubNotificationSettings } from "../homehub-notification-engine";
 
 import { createTRPCRouter, permissionRequiredProcedure } from "../trpc";
 import {
@@ -100,66 +101,56 @@ export const homehubNotificationsRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  clearTelegramToken: permissionRequiredProcedure
-    .requiresPermission("admin")
-    .mutation(async ({ ctx }) => {
-      const current = await getHomeHubNotificationSettingsAsync(ctx.db);
-      await saveHomeHubNotificationSettingsAsync(ctx.db, {
-        ...current,
-        telegram: {
-          ...current.telegram,
-          botToken: "",
-          enabled: false,
-        },
-      });
-      return { success: true };
-    }),
+  clearTelegramToken: permissionRequiredProcedure.requiresPermission("admin").mutation(async ({ ctx }) => {
+    const current = await getHomeHubNotificationSettingsAsync(ctx.db);
+    await saveHomeHubNotificationSettingsAsync(ctx.db, {
+      ...current,
+      telegram: {
+        ...current.telegram,
+        botToken: "",
+        enabled: false,
+      },
+    });
+    return { success: true };
+  }),
 
-  clearIngestToken: permissionRequiredProcedure
-    .requiresPermission("admin")
-    .mutation(async ({ ctx }) => {
-      const current = await getHomeHubNotificationSettingsAsync(ctx.db);
-      await saveHomeHubNotificationSettingsAsync(ctx.db, {
-        ...current,
-        ingestToken: "",
-      });
-      return { success: true };
-    }),
+  clearIngestToken: permissionRequiredProcedure.requiresPermission("admin").mutation(async ({ ctx }) => {
+    const current = await getHomeHubNotificationSettingsAsync(ctx.db);
+    await saveHomeHubNotificationSettingsAsync(ctx.db, {
+      ...current,
+      ingestToken: "",
+    });
+    return { success: true };
+  }),
 
-  testTelegram: permissionRequiredProcedure
-    .requiresPermission("admin")
-    .mutation(async ({ ctx }) => {
-      const settings = await getHomeHubNotificationSettingsAsync(ctx.db);
-      await sendTelegramNotification(settings.telegram, {
-        source: "HomeHub",
-        title: "Telegram test successful",
-        message: "Your HomeHub Telegram notification channel is working.",
-        severity: "success",
-        category: "system",
-        receivedAt: new Date().toISOString(),
-      });
-      return { success: true };
-    }),
+  testTelegram: permissionRequiredProcedure.requiresPermission("admin").mutation(async ({ ctx }) => {
+    const settings = await getHomeHubNotificationSettingsAsync(ctx.db);
+    await sendTelegramNotification(settings.telegram, {
+      source: "HomeHub",
+      title: "Telegram test successful",
+      message: "Your HomeHub Telegram notification channel is working.",
+      severity: "success",
+      category: "system",
+      receivedAt: new Date().toISOString(),
+    });
+    return { success: true };
+  }),
 
   getHistory: permissionRequiredProcedure.requiresPermission("admin").query(async ({ ctx }) => {
     return await getHomeHubNotificationHistoryAsync(ctx.db);
   }),
 
-  clearHistory: permissionRequiredProcedure
-    .requiresPermission("admin")
-    .mutation(async ({ ctx }) => {
-      await saveHomeHubNotificationHistoryAsync(ctx.db, []);
-      return { success: true };
-    }),
+  clearHistory: permissionRequiredProcedure.requiresPermission("admin").mutation(async ({ ctx }) => {
+    await saveHomeHubNotificationHistoryAsync(ctx.db, []);
+    return { success: true };
+  }),
 
-  markAllRead: permissionRequiredProcedure
-    .requiresPermission("admin")
-    .mutation(async ({ ctx }) => {
-      const history = await getHomeHubNotificationHistoryAsync(ctx.db);
-      await saveHomeHubNotificationHistoryAsync(
-        ctx.db,
-        history.map((item) => ({ ...item, read: true })),
-      );
-      return { success: true };
-    }),
+  markAllRead: permissionRequiredProcedure.requiresPermission("admin").mutation(async ({ ctx }) => {
+    const history = await getHomeHubNotificationHistoryAsync(ctx.db);
+    await saveHomeHubNotificationHistoryAsync(
+      ctx.db,
+      history.map((item) => ({ ...item, read: true })),
+    );
+    return { success: true };
+  }),
 });

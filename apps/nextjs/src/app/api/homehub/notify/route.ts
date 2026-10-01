@@ -32,10 +32,7 @@ export const POST = async (request: Request) => {
   const settings = await getHomeHubNotificationSettingsAsync(db);
 
   if (!settings.ingestToken) {
-    return NextResponse.json(
-      { error: "Notification ingestion is not configured" },
-      { status: 503 },
-    );
+    return NextResponse.json({ error: "Notification ingestion is not configured" }, { status: 503 });
   }
 
   const authorization = request.headers.get("authorization") ?? "";
@@ -50,10 +47,7 @@ export const POST = async (request: Request) => {
   const body: unknown = await request.json().catch(() => null);
   const parsed = notificationSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Invalid notification payload", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid notification payload", issues: parsed.error.issues }, { status: 400 });
   }
 
   const result = await processHomeHubNotificationAsync(db, parsed.data);

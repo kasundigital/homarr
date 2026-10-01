@@ -1,12 +1,6 @@
 export type NotificationSeverity = "info" | "success" | "warning" | "critical";
 
-export type NotificationMatchOperator =
-  | "equals"
-  | "contains"
-  | "startsWith"
-  | "endsWith"
-  | "regex"
-  | "in";
+export type NotificationMatchOperator = "equals" | "contains" | "startsWith" | "endsWith" | "regex" | "in";
 
 export type NotificationMatchField =
   | "source"

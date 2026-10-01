@@ -26,14 +26,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import {
-  IconBell,
-  IconCheck,
-  IconCopy,
-  IconRefresh,
-  IconSend,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconBell, IconCheck, IconCopy, IconRefresh, IconSend, IconTrash } from "@tabler/icons-react";
 
 import { clientApi } from "@homarr/api/client";
 import { showErrorNotification, showSuccessNotification } from "@homarr/notifications";
@@ -71,8 +64,7 @@ const emptyForm: FormState = {
   telegramTopicId: "",
   telegramParseMode: "HTML",
   telegramDisableWebPagePreview: true,
-  telegramMessageTemplate:
-    "<b>{{severity}}</b> • {{source}}\n<b>{{title}}</b>\n{{message}}\n{{sender}}",
+  telegramMessageTemplate: "<b>{{severity}}</b> • {{source}}\n<b>{{title}}</b>\n{{message}}\n{{sender}}",
 };
 
 const splitLines = (value: string): string[] =>
@@ -283,9 +275,7 @@ export const HomeHubNotificationsManager = () => {
                 />
                 <Switch
                   checked={form.keepIgnoredInHistory}
-                  onChange={(event) =>
-                    setForm({ ...form, keepIgnoredInHistory: event.currentTarget.checked })
-                  }
+                  onChange={(event) => setForm({ ...form, keepIgnoredInHistory: event.currentTarget.checked })}
                   label="Keep ignored notifications in history"
                 />
               </SimpleGrid>
@@ -308,9 +298,7 @@ export const HomeHubNotificationsManager = () => {
 
               <Switch
                 checked={form.telegramEnabled}
-                onChange={(event) =>
-                  setForm({ ...form, telegramEnabled: event.currentTarget.checked })
-                }
+                onChange={(event) => setForm({ ...form, telegramEnabled: event.currentTarget.checked })}
                 label="Enable Telegram delivery"
               />
 
@@ -323,9 +311,7 @@ export const HomeHubNotificationsManager = () => {
                       : "Paste the token created with BotFather."
                   }
                   value={form.telegramBotToken}
-                  onChange={(event) =>
-                    setForm({ ...form, telegramBotToken: event.currentTarget.value })
-                  }
+                  onChange={(event) => setForm({ ...form, telegramBotToken: event.currentTarget.value })}
                   placeholder={botConfigured ? "Configured — enter only to replace" : "123456:ABC..."}
                 />
 
@@ -340,9 +326,7 @@ export const HomeHubNotificationsManager = () => {
                   label="Topic / thread ID"
                   description="Optional for Telegram forum topics."
                   value={form.telegramTopicId}
-                  onChange={(event) =>
-                    setForm({ ...form, telegramTopicId: event.currentTarget.value })
-                  }
+                  onChange={(event) => setForm({ ...form, telegramTopicId: event.currentTarget.value })}
                 />
 
                 <Select
@@ -364,9 +348,7 @@ export const HomeHubNotificationsManager = () => {
                 autosize
                 minRows={4}
                 value={form.telegramMessageTemplate}
-                onChange={(event) =>
-                  setForm({ ...form, telegramMessageTemplate: event.currentTarget.value })
-                }
+                onChange={(event) => setForm({ ...form, telegramMessageTemplate: event.currentTarget.value })}
               />
 
               <Switch
@@ -428,17 +410,14 @@ export const HomeHubNotificationsManager = () => {
               <Stack>
                 <Title order={3}>Ignored senders / numbers</Title>
                 <Text size="sm" c="dimmed">
-                  One sender, sender ID, or phone number per line. Matching is case-insensitive and
-                  uses contains.
+                  One sender, sender ID, or phone number per line. Matching is case-insensitive and uses contains.
                 </Text>
                 <Textarea
                   autosize
                   minRows={10}
                   placeholder={"+9477...\nDialogPromo\nSAMPATHTXN"}
                   value={form.ignoredSendersText}
-                  onChange={(event) =>
-                    setForm({ ...form, ignoredSendersText: event.currentTarget.value })
-                  }
+                  onChange={(event) => setForm({ ...form, ignoredSendersText: event.currentTarget.value })}
                 />
               </Stack>
             </Card>
@@ -454,9 +433,7 @@ export const HomeHubNotificationsManager = () => {
                   minRows={10}
                   placeholder={"promotion\nspecial offer\nOTP"}
                   value={form.ignoredKeywordsText}
-                  onChange={(event) =>
-                    setForm({ ...form, ignoredKeywordsText: event.currentTarget.value })
-                  }
+                  onChange={(event) => setForm({ ...form, ignoredKeywordsText: event.currentTarget.value })}
                 />
               </Stack>
             </Card>
@@ -466,9 +443,9 @@ export const HomeHubNotificationsManager = () => {
             <Stack>
               <Title order={3}>Advanced rules</Title>
               <Text size="sm" c="dimmed">
-                Full JSON rule editor for sender, message, source, category, severity, account and
-                tag matching. Rules support equals, contains, startsWith, endsWith, regex and in,
-                plus send, ignore, archive, setSeverity, addTag and setCategory actions.
+                Full JSON rule editor for sender, message, source, category, severity, account and tag matching. Rules
+                support equals, contains, startsWith, endsWith, regex and in, plus send, ignore, archive, setSeverity,
+                addTag and setCategory actions.
               </Text>
               <Textarea
                 styles={{ input: { fontFamily: "monospace" } }}
@@ -537,8 +514,7 @@ export const HomeHubNotificationsManager = () => {
                     <Table.Td>{item.notification.sender || "—"}</Table.Td>
                     <Table.Td maw={400}>
                       <Text lineClamp={2}>
-                        {(item.notification.title ? item.notification.title + ": " : "") +
-                          item.notification.message}
+                        {(item.notification.title ? item.notification.title + ": " : "") + item.notification.message}
                       </Text>
                     </Table.Td>
                     <Table.Td>
@@ -639,15 +615,16 @@ export const HomeHubNotificationsManager = () => {
               </Group>
 
               <Alert title="Authentication">
-                Use <Code>Authorization: Bearer YOUR_TOKEN</Code> or{" "}
-                <Code>x-homehub-token: YOUR_TOKEN</Code>.
+                Use <Code>Authorization: Bearer YOUR_TOKEN</Code> or <Code>x-homehub-token: YOUR_TOKEN</Code>.
               </Alert>
 
               <Divider />
 
               <Text fw={600}>Example payload</Text>
               <Code block>
-                {'{\n  "source": "n8n",\n  "sender": "CEB",\n  "title": "Electricity bill received",\n  "message": "Rs 8,420 due on 2026-10-06",\n  "severity": "warning",\n  "category": "bills",\n  "tags": ["electricity", "bill"]\n}'}
+                {
+                  '{\n  "source": "n8n",\n  "sender": "CEB",\n  "title": "Electricity bill received",\n  "message": "Rs 8,420 due on 2026-10-06",\n  "severity": "warning",\n  "category": "bills",\n  "tags": ["electricity", "bill"]\n}'
+                }
               </Code>
             </Stack>
           </Card>

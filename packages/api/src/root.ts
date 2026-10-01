@@ -30,7 +30,9 @@ export const appRouter = createTRPCRouter({
   analytics: lazy(() => import("./router/analytics").then((mod) => mod.analyticsRouter)),
   info: lazy(() => import("./router/info").then((mod) => mod.infoRouter)),
   customWidget: lazy(() => import("./router/custom-widget/custom-widget-router").then((mod) => mod.customWidgetRouter)),
-  homehubNotifications: lazy(() => import("./router/homehubNotifications").then((mod) => mod.homehubNotificationsRouter)),
+  homehubNotifications: lazy(() =>
+    import("./router/homehubNotifications").then((mod) => mod.homehubNotificationsRouter),
+  ),
 });
 
 // export type definition of API

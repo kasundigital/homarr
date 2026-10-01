@@ -3,10 +3,7 @@ import type { IncomingNotification, TelegramNotificationSettings } from "./types
 const escapeHtml = (value: string): string =>
   value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 
-export const renderTelegramTemplate = (
-  template: string,
-  notification: IncomingNotification,
-): string => {
+export const renderTelegramTemplate = (template: string, notification: IncomingNotification): string => {
   const values: Record<string, string> = {
     source: notification.source,
     sender: notification.sender ?? "",
@@ -18,9 +15,7 @@ export const renderTelegramTemplate = (
     receivedAt: notification.receivedAt ?? new Date().toISOString(),
   };
 
-  return template.replace(/{{\s*([a-zA-Z]+)\s*}}/g, (_match, key: string) =>
-    escapeHtml(values[key] ?? ""),
-  );
+  return template.replace(/{{\s*([a-zA-Z]+)\s*}}/g, (_match, key: string) => escapeHtml(values[key] ?? ""));
 };
 
 export const sendTelegramNotification = async (
@@ -48,19 +43,14 @@ export const sendTelegramNotification = async (
     body.message_thread_id = topicId;
   }
 
-  const response = await fetch(
-    "https://api.telegram.org/bot" + settings.botToken.trim() + "/sendMessage",
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-    },
-  );
+  const response = await fetch("https://api.telegram.org/bot" + settings.botToken.trim() + "/sendMessage", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
-    throw new Error(
-      "Telegram API error " + response.status + ": " + detail.slice(0, 300),
-    );
+    throw new Error("Telegram API error " + response.status + ": " + detail.slice(0, 300));
   }
 };

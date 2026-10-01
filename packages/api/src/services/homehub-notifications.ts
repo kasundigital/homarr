@@ -1,13 +1,12 @@
 import SuperJSON from "superjson";
 
 import { decryptSecret, encryptSecret } from "@homarr/common/server";
-import {
-  evaluateNotification,
-  sendTelegramNotification,
-  type HomeHubNotificationSettings,
-  type IncomingNotification,
-  type NotificationHistoryItem,
-  type NotificationRule,
+import { evaluateNotification, sendTelegramNotification } from "../homehub-notification-engine";
+import type {
+  HomeHubNotificationSettings,
+  IncomingNotification,
+  NotificationHistoryItem,
+  NotificationRule,
 } from "../homehub-notification-engine";
 import type { Database } from "@homarr/db";
 import { eq } from "@homarr/db";
@@ -32,8 +31,7 @@ export const defaultHomeHubNotificationSettings: HomeHubNotificationSettings = {
     topicId: "",
     parseMode: "HTML",
     disableWebPagePreview: true,
-    messageTemplate:
-      "<b>{{severity}}</b> • {{source}}\n<b>{{title}}</b>\n{{message}}\n{{sender}}",
+    messageTemplate: "<b>{{severity}}</b> • {{source}}\n<b>{{title}}</b>\n{{message}}\n{{sender}}",
   },
 };
 
@@ -76,9 +74,7 @@ const decryptStoredSecret = (value: string | undefined): string => {
   }
 };
 
-export const getHomeHubNotificationSettingsAsync = async (
-  db: Database,
-): Promise<HomeHubNotificationSettings> => {
+export const getHomeHubNotificationSettingsAsync = async (db: Database): Promise<HomeHubNotificationSettings> => {
   const value = await readRawSettingAsync<Partial<HomeHubNotificationSettings>>(
     db,
     HOMEHUB_NOTIFICATION_SETTINGS_KEY,
@@ -94,7 +90,7 @@ export const getHomeHubNotificationSettingsAsync = async (
     rules: value.rules ?? [],
     telegram: {
       ...defaultHomeHubNotificationSettings.telegram,
-      ...(value.telegram ?? {}),
+      ...value.telegram,
     },
   };
 
@@ -124,9 +120,7 @@ export const saveHomeHubNotificationSettingsAsync = async (
   await writeRawSettingAsync(db, HOMEHUB_NOTIFICATION_SETTINGS_KEY, stored);
 };
 
-export const getHomeHubNotificationHistoryAsync = async (
-  db: Database,
-): Promise<NotificationHistoryItem[]> => {
+export const getHomeHubNotificationHistoryAsync = async (db: Database): Promise<NotificationHistoryItem[]> => {
   return await readRawSettingAsync<NotificationHistoryItem[]>(db, HOMEHUB_NOTIFICATION_HISTORY_KEY, []);
 };
 
@@ -187,8 +181,7 @@ const createBuiltInIgnoreRules = (settings: HomeHubNotificationSettings): Notifi
   return rules;
 };
 
-const makeHistoryId = (): string =>
-  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+const makeHistoryId = (): string => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 
 const addHistoryAsync = async (
   db: Database,
