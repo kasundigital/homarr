@@ -1,5 +1,6 @@
 import SuperJSON from "superjson";
 
+import { decryptSecret, encryptSecret } from "@homarr/common/server";
 import {
   evaluateNotification,
   sendTelegramNotification,
@@ -62,6 +63,19 @@ const writeRawSettingAsync = async <T>(db: Database, key: string, value: T): Pro
   }
 };
 
+const encryptedSecretPattern = /^[0-9a-f]+\.[0-9a-f]{32}$/i;
+
+const decryptStoredSecret = (value: string | undefined): string => {
+  if (!value) return "";
+  if (!encryptedSecretPattern.test(value)) return value;
+
+  try {
+    return decryptSecret(value as `${string}.${string}`);
+  } catch {
+    return "";
+  }
+};
+
 export const getHomeHubNotificationSettingsAsync = async (
   db: Database,
 ): Promise<HomeHubNotificationSettings> => {
@@ -71,7 +85,7 @@ export const getHomeHubNotificationSettingsAsync = async (
     {},
   );
 
-  return {
+  const merged: HomeHubNotificationSettings = {
     ...defaultHomeHubNotificationSettings,
     ...value,
     defaultChannelIds: value.defaultChannelIds ?? defaultHomeHubNotificationSettings.defaultChannelIds,
@@ -83,13 +97,31 @@ export const getHomeHubNotificationSettingsAsync = async (
       ...(value.telegram ?? {}),
     },
   };
+
+  return {
+    ...merged,
+    ingestToken: decryptStoredSecret(merged.ingestToken),
+    telegram: {
+      ...merged.telegram,
+      botToken: decryptStoredSecret(merged.telegram.botToken),
+    },
+  };
 };
 
 export const saveHomeHubNotificationSettingsAsync = async (
   db: Database,
   settings: HomeHubNotificationSettings,
 ): Promise<void> => {
-  await writeRawSettingAsync(db, HOMEHUB_NOTIFICATION_SETTINGS_KEY, settings);
+  const stored: HomeHubNotificationSettings = {
+    ...settings,
+    ingestToken: settings.ingestToken ? encryptSecret(settings.ingestToken) : "",
+    telegram: {
+      ...settings.telegram,
+      botToken: settings.telegram.botToken ? encryptSecret(settings.telegram.botToken) : "",
+    },
+  };
+
+  await writeRawSettingAsync(db, HOMEHUB_NOTIFICATION_SETTINGS_KEY, stored);
 };
 
 export const getHomeHubNotificationHistoryAsync = async (
